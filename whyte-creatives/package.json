@@ -1,0 +1,28 @@
+{
+  "name": "whyte-creatives",
+  "version": "1.0.0",
+  "private": true,
+  "description": "whyteCreatives — photography & videography portfolio site (Akosombo, Ghana)",
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0 -p 3000",
+    "build": "next build",
+    "start": "next start -H 0.0.0.0 -p 3000",
+    "lint": "next lint",
+    "galleries": "node scripts/make-gallery-config.mjs --write",
+    "galleries:preview": "node scripts/make-gallery-config.mjs"
+  },
+  "dependencies": {
+    "next": "^16.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
