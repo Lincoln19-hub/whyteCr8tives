@@ -9,20 +9,13 @@ import { defineField, defineType } from "sanity";
  * sanity/components/FlexCanvas.tsx) rather than by typing 24 numbers.
  */
 
-const GEOMETRY_GROUP = {
-  title: "Position & size",
-  icon: "⊞",
-};
-
-const CONTENT_GROUP = { title: "Content" };
-
 export const element = defineType({
   name: "element",
   title: "Element",
   type: "object",
   groups: [
     { name: "content", title: "Content", default: true },
-    { name: "geometry", ...GEOMETRY_GROUP },
+    { name: "geometry", title: "Position & size" },
   ],
   fields: [
     defineField({
@@ -118,6 +111,31 @@ export const element = defineType({
       type: "array",
       group: "content",
       of: [{ type: "image" }],
+      hidden: ({ parent }) => parent?.kind !== "carousel",
+    }),
+
+    defineField({
+      name: "src",
+      title: "…or an image already on the site",
+      type: "string",
+      group: "content",
+      description:
+        "Path to a file in /public, e.g. /images/horizontal_1.jpg. Use this for " +
+        "the photographs the site already ships with. If both this and Image " +
+        "are filled in, the uploaded Image wins.",
+      hidden: ({ parent }) =>
+        !["image", "card", "carousel"].includes(parent?.kind),
+    }),
+
+    defineField({
+      name: "carouselSrc",
+      title: "…or existing site images (one path per line)",
+      type: "text",
+      group: "content",
+      rows: 4,
+      description:
+        "One /images/….jpg path per line. Used when the Carousel images list " +
+        "above is empty.",
       hidden: ({ parent }) => parent?.kind !== "carousel",
     }),
 

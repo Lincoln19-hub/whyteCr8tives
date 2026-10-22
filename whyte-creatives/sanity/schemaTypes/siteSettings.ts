@@ -176,6 +176,13 @@ export const siteSettings = defineType({
             { name: "price", type: "string", title: "Price label", description: 'e.g. "from $1200"' },
             { name: "image", type: "image", title: "Image", options: { hotspot: true } },
             {
+              name: "src",
+              type: "string",
+              title: "…or an image already on the site",
+              description:
+                'e.g. /images/gallery_3.jpg. Used when Image above is empty.',
+            },
+            {
               name: "features",
               type: "array",
               title: "What's included",

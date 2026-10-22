@@ -37,7 +37,11 @@ export const page = defineType({
       },
       validation: (Rule) =>
         Rule.required().custom((v) => {
-          if (!v?.startsWith("/")) return 'Must start with "/" — e.g. /wedding';
+          const slug = (v as { current?: string } | undefined)?.current ?? "";
+          if (!slug.startsWith("/"))
+            return 'Must start with "/" — e.g. /wedding';
+          if (slug.length > 1 && slug.endsWith("/"))
+            return 'Must not end with "/" (except the home page)';
           return true;
         }),
       description:

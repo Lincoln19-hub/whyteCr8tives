@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useFormValue, type ObjectItem } from "sanity";
-import { Card, Stack, Text } from "@sanity/ui";
+import { useFormValue } from "sanity";
 
 /* ------------------------------------------------------------------
    FlexCanvas — a drag-and-drop editor for the Flex grid.
@@ -118,10 +117,26 @@ function useCanvasStyles() {
   }, []);
 }
 
-export default function FlexCanvas(props: {
-  value?: ObjectItem[];
-  onChange: (patch: unknown) => void;
-}) {
+/** Shape Sanity hands an array-of-objects input. Kept structural on purpose:
+ *  importing ArrayInputProps ties this file to one generic instantiation and
+ *  Sanity's inferred types fight it. */
+/**
+ * Props as Sanity actually hands them to an array input.
+ *
+ * `onChange` is typed as "a function of one argument" on purpose. Sanity's real
+ * signature is `(patch: FormPatch | PatchEvent | FormPatch[]) => void`; writing
+ * that out here makes the component unassignable to `components.input` under
+ * strictFunctionTypes, because TS compares the two function types in the wrong
+ * direction. We only ever emit `{ set: ElementValue[] }`, which is a valid
+ * FormPatch, so the loose signature is safe and keeps the schema type-checked.
+ */
+type CanvasProps = {
+  value?: unknown[] | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onChange: (patch: any) => void;
+};
+
+export default function FlexCanvas(props: CanvasProps) {
   const { value, onChange } = props;
   useCanvasStyles();
 
@@ -150,7 +165,9 @@ export default function FlexCanvas(props: {
   const items = useMemo<ElementValue[]>(
     () =>
       (value ?? [])
-        .filter((v): v is ObjectItem => v != null && typeof v === "object")
+        .filter(
+          (v): v is Record<string, unknown> => v != null && typeof v === "object"
+        )
         .map((v) => v as unknown as ElementValue),
     [value]
   );
@@ -570,15 +587,11 @@ export default function FlexCanvas(props: {
           </div>
         </div>
       ) : (
-        <Card padding={3} tone="default" border radius={2}>
-          <Stack space={2}>
-            <Text size={1} muted>
-              Click an element on the canvas to move, resize, duplicate or delete
-              it. {blockName ? `Block: “${blockName}”.` : ""} Set the block's row
-              counts in the fields above to change how tall this section is.
-            </Text>
-          </Stack>
-        </Card>
+        <div className="fc-hintbox">
+          Click an element on the canvas to move, resize, duplicate or delete it.
+          {blockName ? ` Block: “${blockName}”.` : ""} Set the block&rsquo;s row
+          counts in the fields above to change how tall this section is.
+        </div>
       )}
     </div>
   );
