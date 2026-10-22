@@ -1,24 +1,32 @@
 import type { MetadataRoute } from "next";
-import { galleries } from "@/data/galleries";
+import { portfolioGalleries, services } from "@/data/services";
 import { site } from "@/data/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const base = site.url.replace(/\/$/, "");
 
-  const staticPages: MetadataRoute.Sitemap = [
-    { url: `${base}/`, lastModified: now, changeFrequency: "monthly", priority: 1 },
-    { url: `${base}/portfolio`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${base}/about`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${base}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-  ];
-
-  const galleryPages: MetadataRoute.Sitemap = galleries.map((g) => ({
-    url: `${base}/gallery/${g.slug}`,
+  const page = (
+    path: string,
+    priority: number,
+    changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] = "monthly"
+  ): MetadataRoute.Sitemap[number] => ({
+    url: `${base}${path}`,
     lastModified: now,
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
+    changeFrequency,
+    priority,
+  });
 
-  return [...staticPages, ...galleryPages];
+  return [
+    page("/", 1, "weekly"),
+    page("/about", 0.8),
+    page("/portfolio", 0.9, "weekly"),
+    page("/contact", 0.8),
+
+    // the seven service + ratecard pages
+    ...services.map((s) => page(`/${s.slug}`, 0.85)),
+
+    // the three portfolio galleries
+    ...portfolioGalleries.map((g) => page(`/${g.slug}`, 0.7)),
+  ];
 }

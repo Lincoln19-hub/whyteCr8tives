@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import Reveal from "@/components/Reveal";
+import FlexBlock, { type BlockGeometry } from "@/components/flex/FlexBlock";
+import FlexItem from "@/components/flex/FlexItem";
 import ContactForm from "@/components/ContactForm";
 import { site, values } from "@/data/site";
 
@@ -14,165 +14,222 @@ export const metadata: Metadata = {
     description:
       "Portrait, event and lifestyle photography from Akosombo, Ghana — artistic vision blended with storytelling.",
     url: `${site.url}/about`,
-    images: [{ url: "/images/lincoln-1.jpg", width: 1500, height: 1875, alt: site.owner }],
+    images: [{ url: "/images/lincoln-2.jpg", width: 1500, height: 2000, alt: site.owner }],
   },
+};
+
+/* Block order follows the original /about page:
+   banner+name → bio+portrait → values → "Welcome, I'm glad you're here"
+   → Let's Connect (form + portrait) */
+
+const BANNER: BlockGeometry = {
+  rows: { desktop: 10, tablet: 12, mobile: 16 },
+  padTop: { desktop: 0.2, tablet: 0.2, mobile: 0.2 },
+  padBottom: { desktop: 0.5, tablet: 0.5, mobile: 0.5 },
+};
+
+const BIO: BlockGeometry = {
+  rows: { desktop: 12, tablet: 16, mobile: 24 },
+  padTop: { desktop: 1, tablet: 1, mobile: 0.5 },
+  padBottom: { desktop: 1, tablet: 1, mobile: 0.5 },
+};
+
+const VALUES: BlockGeometry = {
+  rows: { desktop: 8, tablet: 12, mobile: 20 },
+  padTop: { desktop: 0.5, tablet: 0.5, mobile: 0.5 },
+  padBottom: { desktop: 1, tablet: 1, mobile: 0.5 },
+};
+
+const CONNECT: BlockGeometry = {
+  rows: { desktop: 14, tablet: 20, mobile: 34 },
+  padTop: { desktop: 1, tablet: 1, mobile: 0.5 },
+  padBottom: { desktop: 1, tablet: 1, mobile: 1 },
 };
 
 export default function AboutPage() {
   return (
     <>
-      {/* banner + name, as on the original */}
-      <section className="page-head page-head--banner">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/images/banner_4.jpg" alt="" aria-hidden="true" />
-        <div className="hero__scrim" />
-        <div className="wrap">
-          <Reveal>
-            <p className="eyebrow" style={{ color: "rgba(255,255,255,.72)" }}>
-              About
-            </p>
-            <h1 className="display mt-s">
+      {/* ── banner + name ── */}
+      <FlexBlock geometry={BANNER}>
+        <FlexItem
+          box={{
+            desktop: { top: 1, left: 2, width: 24, height: 10 },
+            tablet: { top: 1, left: 2, width: 24, height: 12 },
+            mobile: { top: 1, left: 2, width: 8, height: 8 },
+          }}
+          zIndex={0}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="fb-image"
+            src="/images/lincoln-3.jpg"
+            alt=""
+            aria-hidden="true"
+          />
+        </FlexItem>
+
+        <FlexItem
+          box={{
+            desktop: { top: 3, left: 11, width: 14, height: 7 },
+            tablet: { top: 3, left: 8, width: 17, height: 8 },
+            mobile: { top: 10, left: 2, width: 8, height: 6 },
+          }}
+          zIndex={1}
+        >
+          <div className="fb-text fb-text--center">
+            <h1 className="display about-name">
               My name is
               <br />
-              Lincoln Richmond Whyte
+              Lincoln
+              <br />
+              Richmond
+              <br />
+              Whyte
             </h1>
-            <p className="subtitle mt-m" style={{ color: "rgba(255,255,255,.82)" }}>
-              Portrait &amp; Event Photographer · {site.location}
-            </p>
-          </Reveal>
-        </div>
-      </section>
+          </div>
+        </FlexItem>
+      </FlexBlock>
 
-      {/* bio + portrait */}
-      <section className="section">
-        <div className="wrap split">
-          <Reveal>
-            <p className="eyebrow">The brand</p>
-            <h2 className="h2 mt-s">Hello, I&apos;m Whyte Lincoln</h2>
-            <p className="lead mt-m">
+      {/* ── bio + portrait ── */}
+      <FlexBlock geometry={BIO}>
+        <FlexItem
+          box={{
+            desktop: { top: 1, left: 2, width: 12, height: 12 },
+            tablet: { top: 1, left: 2, width: 14, height: 16 },
+            mobile: { top: 13, left: 2, width: 8, height: 11 },
+          }}
+        >
+          <div className="fb-text">
+            <h2 className="h2">
+              Hello, I&apos;m
+              <br />
+              Whyte Lincoln
+            </h2>
+            <p className="p1 mt-m">
               WhyteCreatives is a professional photography brand based in
               Akosombo, Ghana, dedicated to capturing timeless moments with
-              creativity and precision.
+              creativity and precision. We specialize in portrait, event, and
+              lifestyle photography, blending artistic vision with storytelling
+              to deliver images that speak beyond words. Our goal is to preserve
+              memories and showcase the beauty of people, places, and culture
+              through the lens.
             </p>
-            <p className="body mt-s">
-              We specialise in portrait, event, and lifestyle photography,
-              blending artistic vision with storytelling to deliver images that
-              speak beyond words. Our goal is to preserve memories and showcase
-              the beauty of people, places, and culture through the lens.
-            </p>
-            <p className="body mt-s">
+            <p className="p1 mt-s">
               Lincoln serves as the CEO of Whyte Creatives, a premier visual
               media brand he founded. An accomplished photographer in his own
               right, his artistic expertise in portrait and event photography
-              forms the core of the company&apos;s creative ethos. His leadership
-              is characterised by a dual perspective: a deep understanding of
-              artistic integrity combined with a sharp, strategic approach to
-              business growth. Under his direction, Whyte Creatives delivers a
-              suite of high-end visual services, helping clients build cohesive
-              and compelling brand identities through photography.
+              forms the core of the company&apos;s creative ethos.
             </p>
-            <p className="mt-m">
-              <Link href="/portfolio" className="textlink">
-                See the work <span aria-hidden="true">→</span>
-              </Link>
-            </p>
-          </Reveal>
+          </div>
+        </FlexItem>
 
-          <Reveal variant="mask" delay={120}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/lincoln-2.jpg"
-              alt="Lincoln Richmond Whyte, founder and lead photographer at whyteCreatives"
-              loading="lazy"
-              decoding="async"
-              style={{ width: "100%", aspectRatio: "4 / 5", objectFit: "cover" }}
-            />
-          </Reveal>
-        </div>
-      </section>
+        <FlexItem
+          box={{
+            desktop: { top: 1, left: 15, width: 11, height: 12 },
+            tablet: { top: 1, left: 17, width: 9, height: 16 },
+            mobile: { top: 1, left: 2, width: 8, height: 12 },
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="fb-image"
+            src="/images/lincoln-2.jpg"
+            alt="Lincoln Richmond Whyte, founder and lead photographer at whyteCreatives"
+            loading="lazy"
+          />
+        </FlexItem>
+      </FlexBlock>
 
-      {/* values */}
-      <section className="section section--tight">
-        <div className="wrap">
-          <Reveal className="center">
-            <p className="eyebrow">What we hold to</p>
+      {/* ── values ── */}
+      <FlexBlock geometry={VALUES}>
+        <FlexItem
+          box={{
+            desktop: { top: 1, left: 2, width: 10, height: 2 },
+            tablet: { top: 1, left: 2, width: 14, height: 2 },
+            mobile: { top: 1, left: 2, width: 8, height: 2 },
+          }}
+        >
+          <div className="fb-text">
+            <h5 className="eyebrow">What we hold to</h5>
             <h2 className="h2 mt-s">Our values</h2>
-          </Reveal>
+          </div>
+        </FlexItem>
 
-          <Reveal className="mt-l">
-            <div className="value-list">
-              {values.map((value) => (
-                <div key={value.title}>
-                  <h3>{value.title}</h3>
-                  <p>{value.body}</p>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </div>
-      </section>
+        {values.map((value, i) => {
+          const col = i % 3;
+          const row = Math.floor(i / 3);
+          return (
+            <FlexItem
+              key={value.title}
+              box={{
+                desktop: { top: 4 + row * 2, left: 2 + col * 8, width: 8, height: 2 },
+                tablet: { top: 4 + row * 3, left: 2 + col * 8, width: 8, height: 3 },
+                mobile: { top: 4 + i * 3, left: 2, width: 8, height: 3 },
+              }}
+            >
+              <div className="fb-text value-cell">
+                <h3 className="h4">{value.title}</h3>
+                <p className="p2 mt-s">{value.body}</p>
+              </div>
+            </FlexItem>
+          );
+        })}
+      </FlexBlock>
 
-      {/* welcome + contact */}
-      <section className="section section--alt">
-        <div className="wrap contact-grid">
-          <Reveal>
-            <p className="eyebrow">Welcome, I&apos;m glad you&apos;re here</p>
-            <h2 className="h2 mt-s">Let&apos;s Connect</h2>
-            <p className="body mt-m">
-              Whether it&apos;s a wedding at Akosombo, a graduation in Accra or a
-              brand refresh, start here. The more you tell me, the better I can
-              plan the day.
-            </p>
-            <div className="mt-l">
-              <ContactForm />
-            </div>
-          </Reveal>
+      {/* ── welcome + form ── */}
+      <FlexBlock geometry={CONNECT}>
+        <FlexItem
+          box={{
+            desktop: { top: 1, left: 2, width: 11, height: 2 },
+            tablet: { top: 1, left: 2, width: 14, height: 2 },
+            mobile: { top: 1, left: 2, width: 8, height: 2 },
+          }}
+        >
+          <div className="fb-text">
+            <h2 className="h2">Welcome, I&apos;m glad you&apos;re here</h2>
+          </div>
+        </FlexItem>
 
-          <Reveal variant="mask" delay={140}>
-            <figure style={{ margin: 0 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/portrait_6.jpg"
-                alt="Session frame from whyteCreatives"
-                loading="lazy"
-                decoding="async"
-                style={{ width: "100%", aspectRatio: "3 / 4", objectFit: "cover" }}
-              />
-              <figcaption className="mt-m">
-                <ul className="contact-list">
-                  <li>
-                    <a href={`mailto:${site.email}`}>{site.email}</a>
-                  </li>
-                  <li>
-                    <a href={`tel:${site.phone.replace(/\s/g, "")}`}>
-                      {site.phone}
-                    </a>
-                  </li>
-                  <li>
-                    <span>{site.location}</span>
-                  </li>
-                </ul>
-                <p className="mt-m">
-                  {site.socials.map((s, i) => (
-                    <span key={s.label}>
-                      <a
-                        href={s.href}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        className="textlink"
-                        style={{ marginRight: "1.2rem" }}
-                      >
-                        {s.label}
-                      </a>
-                      {i === site.socials.length - 1 ? "" : ""}
-                    </span>
-                  ))}
-                </p>
-              </figcaption>
-            </figure>
-          </Reveal>
-        </div>
-      </section>
+        <FlexItem
+          box={{
+            desktop: { top: 1, left: 16, width: 10, height: 13 },
+            tablet: { top: 4, left: 15, width: 11, height: 16 },
+            mobile: { top: 22, left: 2, width: 8, height: 12 },
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="fb-image"
+            src="/images/lincoln-4.jpg"
+            alt="Session frame from whyteCreatives"
+            loading="lazy"
+          />
+        </FlexItem>
+
+        <FlexItem
+          box={{
+            desktop: { top: 4, left: 2, width: 12, height: 2 },
+            tablet: { top: 4, left: 2, width: 14, height: 2 },
+            mobile: { top: 4, left: 2, width: 8, height: 2 },
+          }}
+        >
+          <div className="fb-text">
+            <h2 className="h2">Let&apos;s Connect</h2>
+          </div>
+        </FlexItem>
+
+        <FlexItem
+          box={{
+            desktop: { top: 6, left: 2, width: 12, height: 8 },
+            tablet: { top: 6, left: 2, width: 14, height: 14 },
+            mobile: { top: 6, left: 2, width: 8, height: 16 },
+          }}
+        >
+          <div className="fb-text">
+            <ContactForm />
+          </div>
+        </FlexItem>
+      </FlexBlock>
     </>
   );
 }

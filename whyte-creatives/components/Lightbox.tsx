@@ -1,10 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { GalleryImage } from "@/data/galleries";
+
+export type LightboxImage = {
+  src: string;
+  alt: string;
+  ratio?: string;
+};
 
 type LightboxProps = {
-  images: GalleryImage[];
+  images: LightboxImage[];
   index: number | null;
   onClose: () => void;
   onIndexChange: (index: number) => void;

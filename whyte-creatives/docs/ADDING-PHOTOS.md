@@ -1,178 +1,106 @@
 # Adding your own photos
 
-Everything below takes about five minutes and **no code editing**.
+The site references images by path, so swapping photos is a two-step job:
+put the file in `public/images/`, then point the reference at it.
 
 ---
 
-## 1. Make one folder per gallery
+## 1. Where each photo is referenced
 
-Inside `public/images/`, create a folder for each gallery. The folder name
-becomes the web address.
+Everything lives in `data/` — no component edits needed.
 
-```
-public/images/
-├── weddings/          →  /gallery/weddings
-│   ├── IMG_0001.jpg
-│   ├── IMG_0002.jpg
-│   └── IMG_0010.jpg
-├── people/            →  /gallery/people
-│   ├── ama-01.jpg
-│   └── ama-02.jpg
-├── graduation/        →  /gallery/graduation
-├── events/            →  /gallery/events
-├── products/          →  /gallery/products
-├── outdoor/           →  /gallery/outdoor
-└── studio/            →  /gallery/studio
-```
+| File | Controls |
+| ---- | -------- |
+| `data/site.ts` → `homeTiles` | The three tiles under the hero on the home page |
+| `data/services.ts` → `services[].heroImages` | The two images at the top of each service page |
+| `data/services.ts` → `serviceShared` | The "Latest Work" strip and the About / Contact / Portfolio cards (shared by all 7 service pages) |
+| `data/services.ts` → `portfolioGalleries` | The 9 images in each of `/gallery-1`, `/gallery-2`, `/gallery-4` |
+| `data/services.ts` → `portfolioTiles` | The 6 tiles on `/portfolio` |
+| `data/site.ts` → `packages[].image` | The image beside each ratecard package |
 
-Rules:
+Hard-coded in page files (only a handful):
 
-* Folder names should be lowercase, no spaces (use `-` instead).
-* Files are sorted **naturally**, so `IMG_2.jpg` comes before `IMG_10.jpg`.
-  Rename files if you want a specific order — the **first file in each folder
-  becomes that gallery's cover image**.
-* `.jpg`, `.jpeg`, `.png`, `.webp`, `.avif` and `.gif` all work.
-
-Prefer not to use folders? Name files with a `slug--` prefix instead:
-
-```
-public/images/weddings--01.jpg
-public/images/weddings--02.jpg
-public/images/people--01.jpg
-```
-
----
-
-## 2. Generate the gallery data
-
-```bash
-node scripts/make-gallery-config.mjs            # preview what it would write
-node scripts/make-gallery-config.mjs --write    # actually write data/galleries.ts
-```
-
-The script reads each photo's **real pixel dimensions** from the file header and
-records the exact aspect ratio, so every grid reserves the right amount of space
-and nothing jumps around while images load. Tall and wide photos mix correctly in
-the masonry automatically — you don't tag anything.
-
-Output looks like:
-
-```
-Wrote data/galleries.ts
-
-Galleries:
-  /gallery/weddings         42 images   Weddings
-  /gallery/people           18 images   People
-  /gallery/products          9 images   Products
-
-  3 image(s) not matched to a gallery:
-    /images/about-portrait.jpg
-    ...
-```
-
-Anything listed as *not matched* is still on disk — it just isn't in a gallery.
-Move it into a folder (or give it a `slug--` prefix) and re-run.
-
----
-
-## 3. Titles, blurbs and order
-
-Open `scripts/make-gallery-config.mjs` and edit the maps at the top:
-
-```js
-const META = {
-  weddings: {
-    title: "Weddings",
-    category: "Weddings",
-    blurb: "Vows, first dances, and the quiet glances nobody else noticed…",
-  },
-  // add your own:
-  "bride-and-groom": {
-    title: "Bride & Groom",
-    category: "Weddings",
-    blurb: "…",
-  },
-};
-
-const ORDER = ["weddings", "people", "products", …];  // order on /portfolio
-const FEATURED = ["people", "weddings", "products"];  // tiles on the home page
-const MAX_PER_GALLERY = 0;                            // 0 = show all; or e.g. 24
-```
-
-Then run the generator again. If a folder has no entry in `META`, the script
-derives a title from the folder name (`bride-and-groom` → "Bride And Groom") and
-flags it in the console so you know to add a proper blurb.
-
----
-
-## 4. Photos outside galleries
-
-Portraits of Lincoln, the hero background and the About page image are
-referenced directly in the page files:
-
-| Where | File | What to change |
+| Where | File | Line to change |
 | ----- | ---- | -------------- |
-| Home hero | `app/page.tsx` | `src="/images/banner_4.jpg"` |
-| Home about teaser | `app/page.tsx` | `src="/images/lincoln-1.jpg"` |
-| Home story panel | `app/page.tsx` | `src="/images/portrait_6.jpg"` |
-| About banner | `app/about/page.tsx` | `src="/images/banner_4.jpg"` |
+| Home carousel | `app/page.tsx` | the `carouselImages` array |
+| Home about portrait | `app/page.tsx` | `src="/images/lincoln-1.jpg"` |
+| Home "let's connect" trio | `app/page.tsx` | `horizontal_4`, `horizontal_3`, `horizontal_7` |
+| About banner | `app/about/page.tsx` | `src="/images/lincoln-3.jpg"` |
 | About portrait | `app/about/page.tsx` | `src="/images/lincoln-2.jpg"` |
-| Contact panel | `app/contact/page.tsx` | `src="/images/portrait_6.jpg"` |
-| Social share image | `app/layout.tsx` | `images: [{ url: "/images/banner_4.jpg" … }]` |
+| About form panel | `app/about/page.tsx` | `src="/images/lincoln-4.jpg"` |
+| Contact carousel | `app/contact/page.tsx` | the `carouselImages` array |
+| Contact portrait | `app/contact/page.tsx` | `src="/images/portrait_6.jpg"` |
+| Social share image | `app/layout.tsx` | `images: [{ url: "/images/horizontal_1.jpg" … }]` |
 
-Easiest approach: keep the same filenames and just replace the files. The new
-image inherits every reference, and Vercel serves it from a one-year cache.
-
-> If you replace a file but the old one still shows, it's your browser cache —
-> hard-refresh (Ctrl/Cmd + Shift + R).
+**Easiest path:** keep the same filenames and just replace the files in
+`public/images/`. Every reference keeps working and nothing else changes.
 
 ---
 
-## 5. Before you upload: resize
+## 2. Adding a photo to a gallery
 
-Full-resolution camera files are 20–60 MB each and will make the site crawl.
-Export for web instead:
+Edit the relevant array in `data/services.ts`:
 
-* **Long edge:** 2000–2500 px is plenty (the site's max content width is 1600 px).
-* **Format:** JPEG quality 78–85, or WebP if your editor offers it.
+```ts
+export const portfolioGalleries = [
+  {
+    slug: "gallery-1",
+    title: "Weddings",
+    images: [
+      "/images/horizontal_8.jpg",
+      "/images/my-new-wedding-photo.jpg",   // ← add it here
+      …
+    ],
+  },
+```
+
+Any absolute `https://` URL works too, but local files are faster and can't
+break if a third-party host changes.
+
+---
+
+## 3. Before you upload: resize
+
+Camera originals are 20–60 MB each and will make the site crawl. Export for web:
+
+* **Long edge:** 2000–2500 px (the grid's max width is 1600 px).
+* **Format:** JPEG quality 78–85, or WebP.
 * **Colour:** sRGB.
 * **Target:** roughly 300–700 KB per image.
 
-Free options: [Squoosh](https://squoosh.app) (one at a time, in the browser),
-Lightroom export presets, or `imagemagick` for a whole folder:
+Free options: [Squoosh](https://squoosh.app) (one at a time, in the browser), a
+Lightroom export preset, or ImageMagick for a whole folder:
 
 ```bash
-mkdir -p public/images/weddings
 magick ~/exports/weddings/*.jpg -resize 2200x2200\> -quality 82 \
-  -colorspace sRGB -strip public/images/weddings/
+  -colorspace sRGB -strip public/images/
 ```
 
 ---
 
-## 6. Ship it
+## 4. Layout note — why photos don't need cropping
+
+The Flex grid gives every image box a fixed proportion, and images use
+`object-fit: cover`, so any photo fills its box cleanly regardless of its own
+aspect ratio. You don't need to pre-crop to match.
+
+If you *do* want a different proportion for a particular image, change its box
+in the page's `FlexItem box={…}` — `width` and `height` are counts of square
+grid cells (26 columns across on desktop and tablet, 10 on mobile).
+
+---
+
+## 5. Ship it
 
 ```bash
 npm run build     # sanity-check locally
 git add -A
-git commit -m "Add wedding + people galleries"
+git commit -m "Swap in real wedding photos"
 git push          # Vercel deploys automatically
 ```
 
-That's the whole workflow: drop files in a folder → run the generator → push.
-
----
-
-## Deleting the placeholder photos
-
-The 26 images currently in `public/images/` came from the live Pixieset theme as
-stand-ins. Once your own folders are in place:
-
-```bash
-rm public/images/*.jpg      # removes only the loose placeholder files
-node scripts/make-gallery-config.mjs --write
-```
-
-Your folder-based galleries are untouched, and the loose-file references in step
-4 will need new filenames — or name your replacements to match
-(`banner_4.jpg`, `lincoln-1.jpg`, `lincoln-2.jpg`, `portrait_6.jpg`) and nothing
-else changes.
+> Replaced a file but still seeing the old one? That's browser cache —
+> hard-refresh (Ctrl/Cmd + Shift + R). Vercel serves `/images` with a one-year
+> immutable cache, so keeping the same filename means returning visitors may
+> need that hard refresh once. If that's a problem, upload under a new filename
+> and update the reference instead.

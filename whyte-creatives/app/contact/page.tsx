@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import Reveal from "@/components/Reveal";
-import Marquee from "@/components/Marquee";
+import FlexBlock, { type BlockGeometry } from "@/components/flex/FlexBlock";
+import FlexItem from "@/components/flex/FlexItem";
 import ContactForm from "@/components/ContactForm";
-import { marqueeB } from "@/data/galleries";
-import { process as steps, services, site } from "@/data/site";
+import ImageCarousel from "@/components/ImageCarousel";
+import { process, site } from "@/data/site";
 
 export const metadata: Metadata = {
-  title: "Contact — Let's Connect",
+  title: "Contact — How I work",
   description:
-    "How whyteCreatives works: plan the project, shoot the session, edit and deliver. Get in touch to check availability for weddings, portraits, graduations, events and brand work in Ghana.",
+    "How whyteCreatives works: we connect and plan the project, the session day, then editing and delivery. Get in touch to check availability.",
   alternates: { canonical: "/contact" },
   openGraph: {
     title: `Contact | ${site.shortName}`,
@@ -18,136 +18,150 @@ export const metadata: Metadata = {
   },
 };
 
+/* The original's contact page repeats one block per step:
+   "How I work" (h1) + the number (h1) + the step title (h2) + body. */
+const STEP: BlockGeometry = {
+  rows: { desktop: 6, tablet: 8, mobile: 12 },
+  padTop: { desktop: 0.5, tablet: 0.5, mobile: 0.5 },
+  padBottom: { desktop: 0.5, tablet: 0.5, mobile: 0.5 },
+};
+
+const CAROUSEL: BlockGeometry = {
+  rows: { desktop: 18, tablet: 18, mobile: 10 },
+  padTop: { desktop: 0.5, tablet: 0.5, mobile: 0.5 },
+  padBottom: { desktop: 0.5, tablet: 0.5, mobile: 0.5 },
+};
+
+const CONNECT: BlockGeometry = {
+  rows: { desktop: 14, tablet: 20, mobile: 34 },
+  padTop: { desktop: 1, tablet: 1, mobile: 0.5 },
+  padBottom: { desktop: 1, tablet: 1, mobile: 1 },
+};
+
+const carouselImages = [
+  "/images/vertical_6.jpg",
+  "/images/vertical_9.jpg",
+  "/images/portrait_4.jpg",
+];
+
 export default function ContactPage() {
   return (
     <>
-      <section className="page-head">
-        <div className="wrap">
-          <Reveal>
-            <p className="eyebrow">Contact</p>
-            <h1 className="display">How I work</h1>
-            <p className="lead mt-m">
-              At Whyte Creatives, we approach every project with dedication,
-              creativity, and attention to detail. Our commitment is to provide
-              more than just images and videos — we strive to create meaningful
-              visuals that you can treasure, share, and use with confidence.
-            </p>
-            <p className="subtitle mt-s" style={{ color: "var(--accent-details)" }}>
-              Let&apos;s bring your vision to life.
-            </p>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* the three steps */}
-      <section className="section section--tight">
-        <div className="wrap">
-          {steps.map((item, i) => (
-            <Reveal key={item.step} delay={i * 80}>
-              <article className="step">
-                <div className="step__num">{item.step}</div>
-                <div>
-                  <h2 className="h3">{item.title}</h2>
-                  <p className="body mt-s">{item.body}</p>
-                </div>
-              </article>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      {/* services strip */}
-      <section className="section section--tight">
-        <div className="wrap">
-          <Reveal className="center">
-            <p className="eyebrow">What we shoot</p>
-            <h2 className="h2 mt-s">Services</h2>
-          </Reveal>
-          <Reveal className="mt-l">
-            <div className="value-list">
-              {services.map((service) => (
-                <div key={service.title}>
-                  <h3>{service.title}</h3>
-                  <p>{service.body}</p>
-                </div>
-              ))}
+      {/* ── the three steps, one block each, as on the original ── */}
+      {process.map((item) => (
+        <FlexBlock key={item.step} geometry={STEP}>
+          <FlexItem
+            box={{
+              desktop: { top: 1, left: 2, width: 6, height: 1 },
+              tablet: { top: 1, left: 2, width: 8, height: 1 },
+              mobile: { top: 1, left: 2, width: 8, height: 1 },
+            }}
+          >
+            <div className="fb-text">
+              <h5 className="eyebrow">How I work</h5>
             </div>
-          </Reveal>
-        </div>
-      </section>
+          </FlexItem>
 
-      <section aria-label="Recent frames">
-        <Marquee images={marqueeB} duration={65} />
-      </section>
-
-      {/* the form */}
-      <section className="section section--alt" id="connect">
-        <div className="wrap contact-grid">
-          <Reveal>
-            <p className="eyebrow">Enquiries</p>
-            <h2 className="h2 mt-s">Let&apos;s Connect</h2>
-            <p className="body mt-m">
-              Send the details below and you&apos;ll hear back within 24 hours —
-              usually with availability, a suggested plan and a quote.
-            </p>
-            <div className="mt-l">
-              <ContactForm />
+          <FlexItem
+            box={{
+              desktop: { top: 2, left: 2, width: 3, height: 3 },
+              tablet: { top: 2, left: 2, width: 4, height: 4 },
+              mobile: { top: 2, left: 2, width: 3, height: 3 },
+            }}
+          >
+            <div className="fb-text">
+              <span className="step__num">{item.step}</span>
             </div>
-          </Reveal>
+          </FlexItem>
 
-          <Reveal variant="mask" delay={140}>
-            <div className="contact-aside">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/portrait_6.jpg"
-                alt="Photographer on location with a client"
-                loading="lazy"
-                decoding="async"
-              />
-              <div className="contact-aside__inner">
-                <p className="cardtitle" style={{ color: "#fff" }}>
-                  Direct lines
-                </p>
-                <ul className="contact-list mt-s">
-                  <li>
-                    <a href={`mailto:${site.email}`} style={{ color: "#fff" }}>
-                      {site.email}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href={`tel:${site.phone.replace(/\s/g, "")}`}
-                      style={{ color: "#fff" }}
-                    >
-                      {site.phone}
-                    </a>
-                  </li>
-                  <li>
-                    <span style={{ color: "rgba(255,255,255,.8)" }}>
-                      {site.location} — travelling across Ghana
-                    </span>
-                  </li>
-                </ul>
-              </div>
+          <FlexItem
+            box={{
+              desktop: { top: 2, left: 7, width: 17, height: 4 },
+              tablet: { top: 2, left: 7, width: 19, height: 6 },
+              mobile: { top: 5, left: 2, width: 8, height: 7 },
+            }}
+          >
+            <div className="fb-text">
+              <h2 className="h2">{item.title}</h2>
+              <p className="p1 mt-s">{item.body}</p>
             </div>
+          </FlexItem>
+        </FlexBlock>
+      ))}
 
-            <p className="mt-m">
-              {site.socials.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="textlink"
-                  style={{ marginRight: "1.4rem" }}
-                >
-                  {s.label}
-                </a>
-              ))}
+      {/* ── image carousel ── */}
+      <FlexBlock geometry={CAROUSEL}>
+        <FlexItem
+          box={{
+            desktop: { top: 1, left: 2, width: 24, height: 18 },
+            tablet: { top: 1, left: 2, width: 24, height: 18 },
+            mobile: { top: 1, left: 1, width: 10, height: 10 },
+          }}
+        >
+          <ImageCarousel images={carouselImages} />
+        </FlexItem>
+      </FlexBlock>
+
+      {/* ── Let's Connect: portrait, details and the form ── */}
+      <FlexBlock geometry={CONNECT}>
+        <FlexItem
+          box={{
+            desktop: { top: 1, left: 2, width: 10, height: 13 },
+            tablet: { top: 1, left: 2, width: 12, height: 17 },
+            mobile: { top: 22, left: 2, width: 8, height: 12 },
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="fb-image"
+            src="/images/portrait_6.jpg"
+            alt="Photographer on location with a client"
+            loading="lazy"
+          />
+        </FlexItem>
+
+        <FlexItem
+          box={{
+            desktop: { top: 1, left: 14, width: 12, height: 2 },
+            tablet: { top: 1, left: 15, width: 11, height: 2 },
+            mobile: { top: 1, left: 2, width: 8, height: 2 },
+          }}
+        >
+          <div className="fb-text">
+            <h2 className="h1">Let&apos;s Connect</h2>
+          </div>
+        </FlexItem>
+
+        <FlexItem
+          box={{
+            desktop: { top: 3, left: 14, width: 12, height: 11 },
+            tablet: { top: 3, left: 15, width: 11, height: 16 },
+            mobile: { top: 3, left: 2, width: 8, height: 18 },
+          }}
+        >
+          <div className="fb-text">
+            <ContactForm />
+          </div>
+        </FlexItem>
+
+        <FlexItem
+          box={{
+            desktop: { top: 14, left: 2, width: 10, height: 1 },
+            tablet: { top: 18, left: 2, width: 12, height: 2 },
+            mobile: { top: 34, left: 2, width: 8, height: 1 },
+          }}
+        >
+          <div className="fb-text">
+            <p className="footer-line">
+              <a href={`mailto:${site.email}`}>{site.email}</a>
+              {"  ·  "}
+              <a href={`tel:${site.phoneHref}`}>{site.phone}</a>
+              {"  ·  "}
+              {site.address.join(", ")}
             </p>
-          </Reveal>
-        </div>
-      </section>
+          </div>
+        </FlexItem>
+      </FlexBlock>
     </>
   );
 }

@@ -4,7 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import JsonLd from "@/components/JsonLd";
 import FontPreload from "@/components/FontPreload";
-import Footer from "@/components/Footer";
+import SiteFooter from "@/components/SiteFooter";
 import { site } from "@/data/site";
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     "wedding photography Ghana",
     "portrait photographer",
     "graduation photos Ghana",
-    "product photography",
+    "corporate photography Ghana",
     "videography Ghana",
     "whyteCreatives",
   ],
@@ -32,14 +32,14 @@ export const metadata: Metadata = {
     title: `${site.shortName} — ${site.tagline}`,
     description: site.description,
     url: site.url,
-    images: [{ url: "/images/banner_4.jpg", width: 1600, height: 900, alt: site.shortName }],
+    images: [{ url: "/images/horizontal_1.jpg", width: 1500, height: 1000, alt: site.shortName }],
     locale: "en_GH",
   },
   twitter: {
     card: "summary_large_image",
     title: `${site.shortName} — ${site.tagline}`,
     description: site.description,
-    images: ["/images/banner_4.jpg"],
+    images: ["/images/horizontal_1.jpg"],
   },
   robots: { index: true, follow: true },
 };
@@ -65,7 +65,7 @@ export default function RootLayout({
         </a>
         <Header />
         <main id="main">{children}</main>
-        <Footer />
+        <SiteFooter />
         <JsonLd />
       </body>
     </html>

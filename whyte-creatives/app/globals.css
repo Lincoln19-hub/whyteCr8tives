@@ -1358,3 +1358,622 @@ h6 {
   outline: 2px solid var(--accent-button-hover);
   outline-offset: 3px;
 }
+
+/* ============================================================
+   FLEX GRID SYSTEM
+   Faithful reimplementation of Pixieset's Flex "gridWithGaps"
+   block model: a grid of SQUARE cells, 26 columns on desktop and
+   tablet, 10 on mobile, with every element absolutely placed by
+   1-based top / left / width / height.
+   ============================================================ */
+
+.fb-block-outer {
+  position: relative;
+  width: 100%;
+  background: var(--primary-background);
+}
+
+.fb-block-padding-wrap {
+  width: 100%;
+  /* vertical padding derived from the original's --padding-top-scale /
+     --padding-bottom-scale multipliers */
+  padding-top: calc(var(--pad-top-desktop, 1) * var(--block-pad-unit));
+  padding-bottom: calc(var(--pad-bottom-desktop, 1) * var(--block-pad-unit));
+}
+
+.fb-block-wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.fb-block--gridWithGaps {
+  display: grid;
+  grid-template-columns: repeat(var(--cols-desktop, 26), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows-desktop, 1), 1fr);
+  column-gap: var(--column-gap);
+  row-gap: 0;
+  /* square cells ⇒ the block's own ratio is columns ÷ rows */
+  aspect-ratio: calc(var(--cols-desktop, 26) / var(--rows-desktop, 1));
+  width: 100%;
+}
+
+.fb-element {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  grid-row: var(--top) / span var(--height);
+  grid-column: var(--left) / span var(--width);
+  z-index: var(--z, 0);
+}
+
+.fb-element__content {
+  width: 100%;
+  height: 100%;
+}
+
+/* tablet: 768–991px — still 26 columns, own row count */
+@media (min-width: 768px) and (max-width: 991px) {
+  .fb-block--gridWithGaps {
+    grid-template-rows: repeat(var(--rows-tablet, 1), 1fr);
+    aspect-ratio: calc(var(--cols-desktop, 26) / var(--rows-tablet, 1));
+    column-gap: var(--column-gap-tablet);
+  }
+  .fb-element {
+    grid-row: var(--top-t) / span var(--height-t);
+    grid-column: var(--left-t) / span var(--width-t);
+  }
+  .fb-block-padding-wrap {
+    padding-top: calc(var(--pad-top-tablet, 1) * var(--block-pad-unit));
+    padding-bottom: calc(var(--pad-bottom-tablet, 1) * var(--block-pad-unit));
+  }
+}
+
+/* mobile: ≤767px — 10 columns */
+@media (max-width: 767px) {
+  .fb-block--gridWithGaps {
+    grid-template-columns: repeat(var(--cols-mobile, 10), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--rows-mobile, 1), 1fr);
+    aspect-ratio: calc(var(--cols-mobile, 10) / var(--rows-mobile, 1));
+    column-gap: var(--column-gap-mobile);
+  }
+  .fb-element {
+    grid-row: var(--top-m) / span var(--height-m);
+    grid-column: var(--left-m) / span var(--width-m);
+  }
+  .fb-block-padding-wrap {
+    padding-top: calc(var(--pad-top-mobile, 1) * var(--block-pad-unit));
+    padding-bottom: calc(var(--pad-bottom-mobile, 1) * var(--block-pad-unit));
+  }
+}
+
+/* the base vertical rhythm unit the padding scales multiply */
+:root {
+  --block-pad-unit: clamp(1.5rem, 5.5vw, 6rem);
+}
+
+/* ---------- Flex element content types ---------- */
+
+/* text elements align to the top of their box, like the original */
+.fb-text {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.fb-text--center {
+  justify-content: center;
+}
+
+/* images fill their box */
+.fb-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: var(--bg-alt);
+}
+
+.fb-image--contain {
+  object-fit: contain;
+}
+
+/* alignment helpers matching Pixieset's ql-align-* classes */
+.al-right {
+  text-align: right;
+}
+.al-left {
+  text-align: left;
+}
+.al-center {
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .al-desktop-right {
+    text-align: left;
+  }
+}
+@media (min-width: 768px) {
+  .al-desktop-right {
+    text-align: right;
+  }
+}
+
+/* the full-bleed image carousel block (block 4 on the home page) */
+.fb-carousel {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ============================================================
+   NAV DROPDOWNS  ("Services & Ratecards" + "Portfolio")
+   ============================================================ */
+
+.nav__group {
+  position: relative;
+}
+
+.nav__link--folder {
+  background: none;
+  border: 0;
+  padding: 0.4rem 0;
+}
+
+.nav__chevron {
+  display: inline-block;
+  margin-left: 0.45em;
+  font-size: 0.9em;
+  transition: transform 0.35s var(--ease);
+}
+
+.nav__group:hover .nav__chevron,
+.nav__link[aria-expanded="true"] .nav__chevron {
+  transform: rotate(45deg);
+}
+
+.nav__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 6px);
+  min-width: 250px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 44px rgba(34, 36, 38, 0.13);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease),
+    visibility 0.3s;
+  z-index: 70;
+}
+
+.nav__dropdown[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+.nav__dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.nav__dropdown a {
+  display: block;
+  padding: 0.62rem 1.35rem;
+  font-family: var(--sans-nav);
+  font-size: var(--fs-p2);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-paragraphs);
+  transition: background 0.25s var(--ease), color 0.25s var(--ease);
+  white-space: nowrap;
+}
+
+.nav__dropdown a:hover,
+.nav__dropdown a[data-active="true"] {
+  background: var(--bg);
+  color: var(--accent-headings);
+}
+
+/* ---------- mobile overlay nav with nested children ---------- */
+
+.mobile-nav nav {
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.mobile-nav__group {
+  border-bottom: 1px solid var(--line);
+}
+
+.mobile-nav__group > a,
+.mobile-nav__folder {
+  display: block;
+  font-family: var(--serif);
+  font-size: var(--fs-h3);
+  letter-spacing: -0.02em;
+  color: var(--accent-headings);
+  padding-block: 0.55rem;
+}
+
+.mobile-nav__folder {
+  color: var(--accent-details);
+}
+
+.mobile-nav__children {
+  display: grid;
+  padding-bottom: 0.7rem;
+}
+
+.mobile-nav__children a {
+  font-family: var(--sans-nav);
+  font-size: var(--fs-p2);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-paragraphs);
+  padding-block: 0.4rem;
+  padding-left: 1rem;
+  border-bottom: 0;
+}
+
+/* ============================================================
+   CAROUSEL (home block 4)
+   ============================================================ */
+
+.carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-alt);
+}
+
+.carousel__track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.85s var(--ease);
+}
+
+.carousel__slide {
+  flex: 0 0 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.carousel__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--surface) 62%, transparent);
+  border: 0;
+  color: var(--accent-headings);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease), background 0.3s var(--ease);
+  z-index: 3;
+}
+
+.carousel:hover .carousel__arrow,
+.carousel:focus-within .carousel__arrow {
+  opacity: 1;
+}
+
+.carousel__arrow:hover {
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+}
+
+.carousel__arrow--prev {
+  left: 1rem;
+}
+.carousel__arrow--next {
+  right: 1rem;
+}
+
+.carousel__dots {
+  position: absolute;
+  bottom: 1.1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.55rem;
+  z-index: 3;
+}
+
+.carousel__dot {
+  width: 26px;
+  height: 2px;
+  padding: 0;
+  border: 0;
+  background: rgba(255, 255, 255, 0.42);
+  transition: background 0.35s var(--ease);
+}
+
+.carousel__dot[data-active="true"] {
+  background: #fff;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.site-footer-block {
+  border-top: 1px solid var(--line);
+}
+
+.footer-services {
+  font-family: var(--sans-nav);
+  font-size: var(--fs-p2);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-details);
+  margin: 0;
+  line-height: 1.7;
+}
+
+.footer-line {
+  font-size: var(--fs-p1);
+  color: var(--accent-paragraphs);
+  margin: 0;
+  line-height: 1.8;
+}
+
+.footer-line a {
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.35s var(--ease), color 0.35s var(--ease);
+}
+
+.footer-line a:hover {
+  color: var(--accent-headings);
+  border-color: var(--accent-details);
+}
+
+.footer-copy {
+  font-family: var(--sans-body);
+  font-size: var(--fs-p3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 0;
+}
+
+.footer-links,
+.social-links {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.6rem;
+  margin: 0;
+  padding: 0;
+}
+
+.social-links {
+  justify-content: flex-end;
+}
+
+@media (max-width: 767px) {
+  .social-links {
+    justify-content: flex-start;
+  }
+}
+
+.footer-links a,
+.social-links a {
+  font-family: var(--sans-nav);
+  font-size: var(--fs-p2);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-paragraphs);
+  border-bottom: 1px solid transparent;
+  transition: color 0.35s var(--ease), border-color 0.35s var(--ease);
+}
+
+.footer-links a:hover,
+.social-links a:hover {
+  color: var(--accent-headings);
+  border-color: var(--accent-details);
+}
+
+.back-to-top {
+  width: 100%;
+  height: 100%;
+  min-height: 34px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--accent-headings);
+  transition: background 0.35s var(--ease), color 0.35s var(--ease),
+    border-color 0.35s var(--ease);
+}
+
+.back-to-top:hover {
+  background: var(--accent-headings);
+  border-color: var(--accent-headings);
+  color: #fff;
+}
+
+/* ============================================================
+   HERO TILES
+   ============================================================ */
+
+.fb-tile {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-alt);
+}
+
+.fb-tile img {
+  transition: transform 1.5s var(--ease);
+}
+
+.fb-tile:hover img {
+  transform: scale(1.045);
+}
+
+/* paragraph-1 as used inside Flex text elements */
+.p1 {
+  font-family: var(--sans-body);
+  font-size: var(--fs-p1);
+  line-height: 1.8;
+  color: var(--accent-paragraphs);
+  margin: 0;
+}
+
+/* ============================================================
+   SERVICE PAGES — packages, feature lists, link cards
+   ============================================================ */
+
+.feature-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.feature-list li {
+  position: relative;
+  padding-left: 1.5rem;
+  font-family: var(--sans-body);
+  font-size: var(--fs-p1);
+  line-height: 1.75;
+  color: var(--accent-paragraphs);
+}
+
+.feature-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 7px;
+  height: 1px;
+  background: var(--accent-details);
+}
+
+.price {
+  font-family: var(--sans-body);
+  font-size: var(--fs-h5);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-headings);
+  margin: 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+}
+
+.p2 {
+  font-family: var(--sans-body);
+  font-size: var(--fs-p2);
+  line-height: 1.8;
+  color: var(--accent-paragraphs);
+  margin: 0;
+}
+
+/* the About me / Contact me / Portfolio cards on service pages */
+.fb-card {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-alt);
+}
+
+.fb-card img {
+  transition: transform 1.5s var(--ease);
+}
+
+.fb-card:hover img {
+  transform: scale(1.045);
+}
+
+.fb-card__body {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: clamp(1rem, 2vw, 1.7rem);
+  background: linear-gradient(
+    to top,
+    rgba(18, 22, 28, 0.82) 0%,
+    rgba(18, 22, 28, 0.16) 62%,
+    transparent 100%
+  );
+}
+
+.fb-card__heading .h3 {
+  color: #fff;
+  font-size: var(--fs-h3);
+}
+
+.fb-card__link {
+  font-family: var(--sans-nav);
+  font-size: var(--fs-p3);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* fills its Flex box so Reveal wrappers don't collapse */
+.fb-fill {
+  width: 100%;
+  height: 100%;
+}
+
+/* gallery frames without a known ratio: let the image decide */
+.frame.r-auto {
+  aspect-ratio: auto;
+}
+
+.frame.r-auto img {
+  width: 100%;
+  height: auto;
+}
+
+/* about page name treatment */
+.about-name {
+  color: #fff;
+  text-shadow: 0 2px 30px rgba(18, 22, 28, 0.45);
+}
+
+/* values grid cells */
+.value-cell {
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+}
+
+/* step numbers on the contact page (Instrument Serif, as the original) */
+.step__num {
+  font-family: var(--serif);
+  font-size: var(--fs-display);
+  line-height: 0.9em;
+  letter-spacing: -0.02em;
+  color: var(--accent-details);
+  display: block;
+}

@@ -1,11 +1,12 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
+import { site } from "@/data/site";
 
 type Status = { tone: "ok" | "err" | "info"; message: string } | null;
 
 const FALLBACK_EMAIL =
-  process.env.NEXT_PUBLIC_FALLBACK_EMAIL ?? "hello@whytecreatives.com";
+  process.env.NEXT_PUBLIC_FALLBACK_EMAIL ?? site.email;
 
 const SERVICES = [
   "Wedding",

@@ -94,7 +94,7 @@ export async function POST(request: Request) {
   const resendKey = process.env.RESEND_API_KEY?.trim();
   const inbox = process.env.CONTACT_INBOX_EMAIL?.trim();
   const fallback =
-    process.env.NEXT_PUBLIC_FALLBACK_EMAIL?.trim() || "hello@whytecreatives.com";
+    process.env.NEXT_PUBLIC_FALLBACK_EMAIL?.trim() || "whytecobby@gmail.com";
 
   /* ---- Provider A: Formspree ---- */
   if (formspree) {
